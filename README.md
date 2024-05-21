@@ -1,2 +1,4 @@
 # java-shareit
-Template repository for Shareit project.
+Training project for yandex. 
+Key features: 
+-
