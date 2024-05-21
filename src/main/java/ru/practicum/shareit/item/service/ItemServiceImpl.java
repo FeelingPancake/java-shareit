@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.ItemNotExistsExeption;
 import ru.practicum.shareit.error.PermissionException;
@@ -15,13 +14,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private static Long id = 1L;
     private final ItemRepository itemStorage;
+    private long id;
 
-    private static Long generateId() {
-        return id++;
+    public ItemServiceImpl(ItemRepository itemStorage) {
+        this.itemStorage = itemStorage;
+        this.id = 1L;
     }
 
     @Override
@@ -55,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item createItem(ItemDto itemDto, Long ownerId) {
         Item item = Item.builder()
-                .id(generateId())
+                .id(id++)
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(true)
