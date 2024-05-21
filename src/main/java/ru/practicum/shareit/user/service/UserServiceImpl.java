@@ -18,6 +18,10 @@ public class UserServiceImpl implements UserService {
     private static Long id = 1L;
     private final UserRepository userStorage;
 
+    private static Long generateId() {
+        return id++;
+    }
+
     @Override
     public User getUser(Long id) {
         return userStorage.get(id);
@@ -40,7 +44,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = User.builder()
-                .id(id++)
+                .id(generateId())
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();

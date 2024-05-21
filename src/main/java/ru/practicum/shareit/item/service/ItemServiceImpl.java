@@ -7,7 +7,6 @@ import ru.practicum.shareit.error.PermissionException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
-import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,10 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private static Long id = 1L;
     private final ItemRepository itemStorage;
-    private final UserRepository userStorage;
+
+    private static Long generateId() {
+        return id++;
+    }
 
     @Override
     public Item getItem(Long id) {
@@ -53,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item createItem(ItemDto itemDto, Long ownerId) {
         Item item = Item.builder()
-                .id(id++)
+                .id(generateId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(true)
