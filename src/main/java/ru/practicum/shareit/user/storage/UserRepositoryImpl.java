@@ -11,6 +11,7 @@ import java.util.*;
 @Slf4j
 public class UserRepositoryImpl implements UserRepository {
     private final Map<Long, User> temporaryDb = new HashMap<>();
+    private long systemId = 1L;
 
     @Override
     public User get(Long id) {
@@ -26,15 +27,15 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User create(User user) {
-        Long id = user.getId();
-
+        Long id = systemId++;
+        User userWithId = user.toBuilder().id(id).build();
         log.info("Запрос на создание пользователя");
         if (temporaryDb.containsKey(id)) {
             log.warn("Пользователь с id = {} уже существует", id);
-            throw new AlreadyExistsException(user.toString());
+            throw new AlreadyExistsException(id.toString());
         }
 
-        temporaryDb.put(user.getId(), user);
+        temporaryDb.put(id, userWithId);
         log.info("Пользователь с id = {} создан", id);
 
         return temporaryDb.get(id);

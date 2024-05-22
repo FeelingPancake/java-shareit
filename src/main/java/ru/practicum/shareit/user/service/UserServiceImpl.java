@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.AlreadyExistsException;
 import ru.practicum.shareit.error.UserDoesNotExixtsException;
@@ -12,14 +13,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userStorage;
-    private long id;
-
-    public UserServiceImpl(UserRepository userStorage) {
-        this.userStorage = userStorage;
-        this.id = 1L;
-    }
 
     @Override
     public User getUser(Long id) {
@@ -43,14 +39,11 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = User.builder()
-                .id(id++)
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();
 
-        userStorage.create(user);
-
-        return user;
+        return userStorage.create(user);
     }
 
     @Override
