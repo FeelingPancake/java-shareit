@@ -1,14 +1,13 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.ItemNotExistsExeption;
 import ru.practicum.shareit.error.PermissionException;
-import ru.practicum.shareit.error.UserDoesNotExixtsException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,10 +15,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemStorage;
-    private final UserService userService;
+    private final UserRepository userStorage;
 
     @Override
     public Item getItem(Long id) {
@@ -29,9 +28,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> getItems(Long ownerId) {
-        if (userService.getUser(ownerId) == null) {
-            throw new UserDoesNotExixtsException(ownerId.toString());
-        }
+        userStorage.get(ownerId);
 
         return itemStorage.getAll().stream()
                 .filter(item -> Objects.equals(item.getOwnerId(), ownerId))
@@ -50,9 +47,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item createItem(ItemDto itemDto, Long ownerId) {
-        if (userService.getUser(ownerId) == null) {
-            throw new UserDoesNotExixtsException(ownerId.toString());
-        }
+        userStorage.get(ownerId);
 
         Item item = Item.builder()
                 .name(itemDto.getName())
@@ -66,9 +61,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item updateItem(ItemDto itemDto, Long itemId, Long ownerId) {
-        if (userService.getUser(ownerId) == null) {
-            throw new UserDoesNotExixtsException(ownerId.toString());
-        }
+        userStorage.get(ownerId);
 
         Optional<Item> itemOptional = Optional.ofNullable(itemStorage.get(itemId));
         if (itemOptional.isEmpty()) {
@@ -90,9 +83,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public boolean deleteItem(Long id, Long ownerId) {
-        if (userService.getUser(ownerId) == null) {
-            throw new UserDoesNotExixtsException(ownerId.toString());
-        }
+        userStorage.get(ownerId);
 
         if (Objects.equals(itemStorage.get(id).getOwnerId(), ownerId)) {
             return itemStorage.delete(id);

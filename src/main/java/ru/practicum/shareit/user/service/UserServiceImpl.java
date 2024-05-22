@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.AlreadyExistsException;
 import ru.practicum.shareit.error.UserDoesNotExixtsException;
@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userStorage;
 

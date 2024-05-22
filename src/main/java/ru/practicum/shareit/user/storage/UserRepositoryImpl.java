@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.error.AlreadyExistsException;
+import ru.practicum.shareit.error.UserDoesNotExixtsException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -16,7 +17,13 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User get(Long id) {
         log.info("Запрос на получение пользователя по id = {}", id);
-        return temporaryDb.get(id);
+        Optional<User> optionalUser = Optional.ofNullable(temporaryDb.get(id));
+
+        if (optionalUser.isEmpty()) {
+            throw new UserDoesNotExixtsException(id.toString());
+        }
+
+        return optionalUser.get();
     }
 
     @Override

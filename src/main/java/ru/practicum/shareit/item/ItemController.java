@@ -1,13 +1,12 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.annotations.Marker;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -15,11 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/items")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Validated
 public class ItemController {
     private final ItemService itemService;
-    private final UserService userService;
 
     @GetMapping("/{id}")
     public Item get(@PathVariable Long id) {
