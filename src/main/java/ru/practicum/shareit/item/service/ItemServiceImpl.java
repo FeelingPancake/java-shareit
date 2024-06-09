@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.storage.BookingJpaRepository;
 import ru.practicum.shareit.error.ItemNotExistsExeption;
@@ -23,9 +24,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
+    @Autowired
     private final ItemJpaRepository itemStorage;
+    @Autowired
     private final UserJpaRepository userStorage;
+    @Autowired
     private final BookingJpaRepository bookingStorage;
+    @Autowired
     private final CommentJpaRepository commentStorage;
 
     @Override
