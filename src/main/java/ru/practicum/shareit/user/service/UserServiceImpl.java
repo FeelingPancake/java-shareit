@@ -2,78 +2,54 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.error.AlreadyExistsException;
 import ru.practicum.shareit.error.UserDoesNotExixtsException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserRepository;
+import ru.practicum.shareit.user.storage.UserJpaRepository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userStorage;
+    private final UserJpaRepository userStorage;
 
     @Override
     public User getUser(Long id) {
-        return userStorage.get(id);
+        return userStorage.findById(id).orElseThrow(() -> new UserDoesNotExixtsException(id.toString()));
     }
 
     @Override
     public List<User> getUsers() {
 
-        return userStorage.getAll();
+        return userStorage.findAll();
     }
 
     @Override
     public User createUser(UserDto userDto) {
-        List<User> existingUsers = userStorage.getAll().stream()
-                .filter(user -> user.getEmail().equals(userDto.getEmail()))
-                .collect(Collectors.toList());
-
-        if (!existingUsers.isEmpty()) {
-            throw new AlreadyExistsException(userDto.getEmail());
-        }
-
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();
 
-        return userStorage.create(user);
+        return userStorage.save(user);
     }
 
     @Override
     public User updateUser(UserDto userDto, Long id) {
-        Optional<User> userOptional = Optional.ofNullable(userStorage.get(id));
+        User user = userStorage.findById(id).orElseThrow(()
+                -> new UserDoesNotExixtsException(id.toString()));
 
-        if (userOptional.isEmpty()) {
-            throw new UserDoesNotExixtsException(id.toString());
-        }
-
-        List<User> existingUsers = userStorage.getAll().stream()
-                .filter(user -> user.getEmail().equals(userDto.getEmail()))
-                .collect(Collectors.toList());
-        // Мне кажется костылем эта часть, так затем при добавление базы и сущностей уникальность почты будет намного проще
-        if (!existingUsers.isEmpty() && !id.equals(existingUsers.get(0).getId())) {
-            throw new AlreadyExistsException(userDto.getEmail());
-        }
-
-        User user = userOptional.get();
         User userToUpdate = user.toBuilder()
                 .name(userDto.getName() == null ? user.getName() : userDto.getName())
                 .email(userDto.getEmail() == null ? user.getEmail() : userDto.getEmail())
                 .build();
 
-        return userStorage.update(userToUpdate);
+        return userStorage.save(userToUpdate);
     }
 
     @Override
-    public boolean deleteUser(Long id) {
-
-        return userStorage.delete(id);
+    public void deleteUser(Long id) {
+        userStorage.delete(userStorage.getById(id));
     }
 }

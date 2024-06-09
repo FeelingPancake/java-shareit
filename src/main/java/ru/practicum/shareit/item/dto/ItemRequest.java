@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 @Value
 @Builder(toBuilder = true)
-public class ItemDto {
+public class ItemRequest {
     @NotBlank(groups = {Marker.OnCreate.class}, message = "Имя вещи обязательна")
     String name;
     @Size(max = 255, message = "Описание не более 255 символов")
