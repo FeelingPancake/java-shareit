@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@PropertySource(value = "classpath:application.properties")
+@PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 public class PersistenceConfig {
     private final Environment environment;
 
