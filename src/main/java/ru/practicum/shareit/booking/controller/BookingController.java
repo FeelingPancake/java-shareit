@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 public class BookingController {
     private final BookingService bookingService;
 
-
     @GetMapping(path = "/{bookingId}")
     public BookingDto getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                  @PathVariable Long bookingId) {
