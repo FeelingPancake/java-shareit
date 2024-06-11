@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.dto;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Future;
@@ -9,15 +11,16 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingRequest {
     @NotNull
-    private Long itemId;
+    Long itemId;
     @FutureOrPresent
     @NotNull
-    private LocalDateTime start;
+    LocalDateTime start;
     @Future
     @NotNull
-    private LocalDateTime end;
+    LocalDateTime end;
 
     @AssertTrue(message = "Конечная дата аренды не должна быть раньше начальной даты")
     public boolean isStartDateBeforeDate() {

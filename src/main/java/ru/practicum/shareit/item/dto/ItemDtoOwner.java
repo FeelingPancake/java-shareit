@@ -1,12 +1,15 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
-@Value
+@Data
 @Builder(toBuilder = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemDtoOwner {
     Long id;
     String name;

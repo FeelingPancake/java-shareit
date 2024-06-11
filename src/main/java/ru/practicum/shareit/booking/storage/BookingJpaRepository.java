@@ -77,17 +77,13 @@ public interface BookingJpaRepository extends JpaRepository<Booking, Long> {
     List<Booking> findCompletedBookingForUserAndItem(@Param("itemId") Long itemId, @Param("userId") Long userId);
 
 
-    // Блин, вот создаешь метод, который проверяет на оверлап, а оказывается он не нужен и даже мешает тестам
-//    @Query("SELECT CASE WHEN COUNT(b) > 0 THEN TRUE ELSE FALSE END " +
-//            "FROM Booking b " +
-//            "WHERE b.item.id = :itemId " +
-//            "AND b.status = 'APPROVED' " +
-//            "AND b.id <> :bookingId " +
-//            "AND ((b.startDate < :endDate AND b.endDate > :startDate) " +
-//            "OR (b.startDate >= :startDate AND b.startDate < :endDate) " +
-//            "OR (b.endDate > :startDate AND b.endDate <= :endDate))")
-//    boolean existsApprovedBookingByItemIdAndTimeRange(@Param("itemId") Long itemId,
-//                                                      @Param("bookingId") Long bookingId,
-//                                                      @Param("startDate") LocalDateTime startDate,
-//                                                      @Param("endDate") LocalDateTime endDate);
+    @Query("SELECT CASE WHEN COUNT(b) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM Booking b " +
+            "WHERE b.item.id = :itemId " +
+            "AND b.status = 'APPROVED' " +
+            "AND b.startDate <= :endDate AND b.endDate >= :startDate")
+    boolean existsApprovedBookingByItemIdAndTimeRange(
+            @Param("itemId") Long itemId,
+            @Param("startDate")LocalDateTime startDate,
+            @Param("endDate")LocalDateTime endDate);
 }

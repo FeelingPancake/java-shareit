@@ -3,10 +3,9 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.storage.BookingJpaRepository;
-import ru.practicum.shareit.error.ItemNotExistsExeption;
+import ru.practicum.shareit.error.ElementAccessException;
+import ru.practicum.shareit.error.EntityNotExistsExeption;
 import ru.practicum.shareit.error.PermissionException;
-import ru.practicum.shareit.error.UserBookingNotExistsException;
-import ru.practicum.shareit.error.UserDoesNotExixtsException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -30,8 +29,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDtoOwner getItem(Long userId, Long itemId) {
-        userStorage.findById(userId).orElseThrow(() -> new UserDoesNotExixtsException(userId.toString()));
-        Item item = itemStorage.findById(itemId).orElseThrow(() -> new ItemNotExistsExeption(itemId.toString()));
+        userStorage.findById(userId).orElseThrow(() -> new EntityNotExistsExeption(userId.toString()));
+        Item item = itemStorage.findById(itemId).orElseThrow(() -> new EntityNotExistsExeption(itemId.toString()));
         if (item.getOwner().getId().equals(userId)) {
             return ItemMapper.toItemDtoOwner(item,
                     bookingStorage.findLastBookingForItem(itemId).stream().findFirst().orElse(null),
@@ -51,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDtoOwner> getItems(Long ownerId) {
-        userStorage.findById(ownerId).orElseThrow(() -> new UserDoesNotExixtsException(ownerId.toString()));
+        userStorage.findById(ownerId).orElseThrow(() -> new EntityNotExistsExeption(ownerId.toString()));
 
         List<Item> items = itemStorage.findByOwnerId(ownerId);
         List<ItemDtoOwner> itemDtoOwners = items.stream()
@@ -78,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item createItem(ItemRequest itemRequest, Long ownerId) {
-        User user = userStorage.findById(ownerId).orElseThrow(() -> new UserDoesNotExixtsException(ownerId.toString()));
+        User user = userStorage.findById(ownerId).orElseThrow(() -> new EntityNotExistsExeption(ownerId.toString()));
 
         Item item = Item.builder()
                 .name(itemRequest.getName())
@@ -95,17 +94,17 @@ public class ItemServiceImpl implements ItemService {
                                  CommentRequest commentRequest,
                                  Long itemId) {
         if (!userStorage.existsById(userId)) {
-            throw new UserDoesNotExixtsException(userId.toString());
+            throw new EntityNotExistsExeption(userId.toString());
         }
 
         if (!itemStorage.existsById(itemId)) {
-            throw new ItemNotExistsExeption(itemId.toString());
+            throw new EntityNotExistsExeption(itemId.toString());
         }
 
         Boolean isBooked = !bookingStorage.findCompletedBookingForUserAndItem(itemId, userId).isEmpty();
 
         if (!isBooked) {
-            throw new UserBookingNotExistsException("Пользователь " + userId + " не брал вещь в аренду");
+            throw new ElementAccessException("Пользователь " + userId + " не брал вещь в аренду");
         }
 
         Comment comment = Comment.builder()
@@ -119,10 +118,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item updateItem(ItemRequest itemRequest, Long itemId, Long ownerId) {
-        userStorage.findById(ownerId).orElseThrow(() -> new UserDoesNotExixtsException(ownerId.toString()));
+        userStorage.findById(ownerId).orElseThrow(() -> new EntityNotExistsExeption(ownerId.toString()));
 
         Item item = itemStorage.findById(itemId).orElseThrow(
-                () -> new ItemNotExistsExeption(itemId.toString()));
+                () -> new EntityNotExistsExeption(itemId.toString()));
 
         if (!Objects.equals(item.getOwner().getId(), ownerId)) {
             throw new PermissionException(ownerId.toString());
@@ -138,7 +137,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItem(Long id, Long ownerId) {
-        Item item = itemStorage.findById(id).orElseThrow(() -> new ItemNotExistsExeption(id.toString()));
+        Item item = itemStorage.findById(id).orElseThrow(() -> new EntityNotExistsExeption(id.toString()));
 
         User user = item.getOwner();
 

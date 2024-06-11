@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.error.UserDoesNotExixtsException;
+import ru.practicum.shareit.error.EntityNotExistsExeption;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserJpaRepository;
@@ -16,7 +16,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(Long id) {
-        return userStorage.findById(id).orElseThrow(() -> new UserDoesNotExixtsException(id.toString()));
+        return userStorage.findById(id).orElseThrow(() -> new EntityNotExistsExeption(id.toString()));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(UserDto userDto, Long id) {
         User user = userStorage.findById(id).orElseThrow(()
-                -> new UserDoesNotExixtsException(id.toString()));
+                -> new EntityNotExistsExeption(id.toString()));
 
         User userToUpdate = user.toBuilder()
                 .name(userDto.getName() == null ? user.getName() : userDto.getName())

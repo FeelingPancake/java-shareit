@@ -1,9 +1,7 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -15,17 +13,18 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "items", schema = "public")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
-    private String name;
-    private String description;
+    User owner;
+    String name;
+    String description;
     @Column(name = "is_available", nullable = false)
-    private Boolean available;
+    Boolean available;
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+    List<Comment> comments;
 }

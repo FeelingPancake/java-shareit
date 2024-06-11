@@ -1,9 +1,7 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -16,19 +14,20 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "comments", schema = "public")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    Item item;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    private String text;
+    User user;
+    String text;
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {

@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.shareit.error.*;
+import ru.practicum.shareit.error.AlreadyExistsException;
+import ru.practicum.shareit.error.ElementAccessException;
+import ru.practicum.shareit.error.EntityNotExistsExeption;
+import ru.practicum.shareit.error.PermissionException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
@@ -24,7 +27,7 @@ public class ExceptionApiHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({ItemAlreadyReservedException.class, ItemUnavailableException.class, UserBookingNotExistsException.class})
+    @ExceptionHandler({ElementAccessException.class})
     public ErrorResponse handleAvalaibilityExceptions(Throwable ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.toString());
         errorResponse.log();
@@ -32,9 +35,7 @@ public class ExceptionApiHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({ItemNotExistsExeption.class, OwnerDoesNotExixtsExeption.class,
-            UserDoesNotExixtsException.class, BookingNotExistsException.class, PermissionException.class,
-            OwnerBookingHisItemExeption.class, UserPermissionException.class})
+    @ExceptionHandler({EntityNotExistsExeption.class, PermissionException.class})
     public ErrorResponse handleNotFoundExceptions(RuntimeException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.toString());
         errorResponse.log();

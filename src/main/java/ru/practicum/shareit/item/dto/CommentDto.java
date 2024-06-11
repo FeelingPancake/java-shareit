@@ -1,13 +1,16 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.item.model.Comment;
 
 import java.time.LocalDateTime;
 
-@Value
+@Data
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentDto {
     Long id;
     String text;
