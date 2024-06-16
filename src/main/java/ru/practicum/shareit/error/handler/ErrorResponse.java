@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
-@Value
-@Slf4j
-@AllArgsConstructor
+    @Value
+    @Slf4j
+    @AllArgsConstructor
 public class ErrorResponse {
     String error;
 
