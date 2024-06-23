@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.model.Comment;
 
 import java.time.LocalDateTime;
 
@@ -16,13 +15,4 @@ public class CommentDto {
     String text;
     String authorName;
     LocalDateTime created;
-
-    public static CommentDto toCommentDto(Comment comment) {
-        return CommentDto.builder()
-                .id(comment.getId())
-                .text(comment.getText())
-                .authorName(comment.getUser().getName())
-                .created(comment.getCreatedAt())
-                .build();
-    }
 }

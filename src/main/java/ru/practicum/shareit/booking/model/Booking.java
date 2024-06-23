@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.BookingStatus;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.utils.enums.BookingStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,10 +21,10 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     Item item;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     User booker;
     @Enumerated(EnumType.STRING)

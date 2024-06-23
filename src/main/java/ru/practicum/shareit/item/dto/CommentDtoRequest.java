@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentRequest {
+public class CommentDtoRequest {
     @NotBlank
     @Size(max = 600, message = "Комментарий не более 600 символов")
     String text;

@@ -7,10 +7,12 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserJpaRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserJpaRepository userStorage;
 
@@ -50,6 +52,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        userStorage.delete(userStorage.getById(id));
+        userStorage.delete(userStorage.findById(id).orElseThrow(() -> new EntityNotExistsExeption(id.toString())));
     }
 }

@@ -1,9 +1,10 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.controller.State;
 import ru.practicum.shareit.booking.dto.BookingRequest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.storage.BookingJpaRepository;
@@ -12,13 +13,16 @@ import ru.practicum.shareit.error.EntityNotExistsExeption;
 import ru.practicum.shareit.error.PermissionException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemJpaRepository;
-import ru.practicum.shareit.user.model.BookingStatus;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserJpaRepository;
+import ru.practicum.shareit.utils.enums.BookingStatus;
+import ru.practicum.shareit.utils.enums.State;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Transactional
 @Service
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
@@ -38,61 +42,65 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsForBooker(Long userId, State state) {
+    public List<Booking> getBookingsForBooker(Long userId, State state, int from, int size) {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotExistsExeption(userId.toString());
         }
 
         LocalDateTime currentDate = LocalDateTime.now();
         Sort sort = Sort.by(Sort.Direction.DESC, "startDate");
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         switch (state) {
             case ALL:
-                return bookingRepository.findByBookerId(userId, sort);
+                return bookingRepository.findByBookerId(userId, pageable);
             case PAST:
-                return bookingRepository.findByBookerIdAndEndDateLessThan(userId, currentDate, sort);
+                return bookingRepository.findByBookerIdAndEndDateLessThan(userId, currentDate, pageable);
             case FUTURE:
-                return bookingRepository.findByBookerIdAndStartDateGreaterThan(userId, currentDate, sort);
+                return bookingRepository.findByBookerIdAndStartDateGreaterThan(userId, currentDate, pageable);
             case CURRENT:
                 return bookingRepository.findByBookerIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(userId,
                         currentDate,
                         currentDate,
-                        sort);
+                        pageable);
             case WAITING:
-                return bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING, sort);
+                return bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING, pageable);
             case REJECTED:
-                return bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED, sort);
+                return bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED, pageable);
             default:
                 throw new UnsupportedOperationException("Неизвестный параметр state: " + state);
         }
     }
 
     @Override
-    public List<Booking> getBookingsForOwner(Long userId, State state) {
+    public List<Booking> getBookingsForOwner(Long userId, State state, int from, int size) {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotExistsExeption(userId.toString());
         }
 
         LocalDateTime currentDate = LocalDateTime.now();
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         switch (state) {
             case ALL:
-                return bookingRepository.findByItemOwnerId(userId, sort);
+                return bookingRepository.findByItemOwnerId(userId, pageable);
             case PAST:
-                return bookingRepository.findByItemOwnerIdAndEndDateLessThan(userId, currentDate, sort);
+                return bookingRepository.findByItemOwnerIdAndEndDateLessThan(userId, currentDate, pageable);
             case FUTURE:
-                return bookingRepository.findByItemOwnerIdAndStartDateGreaterThan(userId, currentDate, sort);
+                return bookingRepository.findByItemOwnerIdAndStartDateGreaterThan(userId, currentDate, pageable);
             case CURRENT:
                 return bookingRepository.findByItemOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
                         userId,
                         currentDate,
                         currentDate,
-                        sort);
+                        pageable);
             case WAITING:
-                return bookingRepository.findByItemOwnerIdAndStatus(userId, BookingStatus.WAITING, sort);
+                return bookingRepository.findByItemOwnerIdAndStatus(userId, BookingStatus.WAITING, pageable);
             case REJECTED:
-                return bookingRepository.findByItemOwnerIdAndStatus(userId, BookingStatus.REJECTED, sort);
+                return bookingRepository.findByItemOwnerIdAndStatus(userId, BookingStatus.REJECTED, pageable);
             default:
                 throw new UnsupportedOperationException("Unknown state:" + state);
         }
@@ -126,7 +134,12 @@ public class BookingServiceImpl implements BookingService {
                     + bookingRequest.getStart() + ", конец - " + bookingRequest.getEnd());
         }
 
-        Booking booking = Booking.builder().item(item).booker(user).startDate(bookingRequest.getStart()).endDate(bookingRequest.getEnd()).build();
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(user)
+                .startDate(bookingRequest.getStart())
+                .endDate(bookingRequest.getEnd())
+                .build();
 
         Booking savedBooking = bookingRepository.save(booking);
 

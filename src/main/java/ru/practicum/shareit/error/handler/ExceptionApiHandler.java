@@ -19,7 +19,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class ExceptionApiHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class, UnsupportedOperationException.class})
     public ErrorResponse handleValidationExceptions(Throwable ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.toString());
         errorResponse.log();
