@@ -207,7 +207,7 @@ class ItemServiceImplTest {
 
         when(itemStorage.findAll(pageable)).thenReturn(new PageImpl<>(items));
 
-        List<Item> result = itemService.findItems(text, from, size);
+        List<ItemDto> result = itemService.findItems(text, from, size);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -225,7 +225,7 @@ class ItemServiceImplTest {
 
         when(itemStorage.findAll(pageable)).thenReturn(new PageImpl<>(items));
 
-        List<Item> result = itemService.findItems(text, from, size);
+        List<ItemDto> result = itemService.findItems(text, from, size);
 
         assertEquals(0, result.size());
         verify(itemStorage, times(1)).findAll(pageable);

@@ -142,7 +142,7 @@ public class ItemControllerTest {
 
     @Test
     void searchItems_success() throws Exception {
-        List<Item> items = Collections.singletonList(new Item());
+        List<ItemDto> items = Collections.singletonList(ItemDto.builder().build());
         when(itemService.findItems(anyString(), anyInt(), anyInt())).thenReturn(items);
 
         mockMvc.perform(get("/items/search")
@@ -156,7 +156,7 @@ public class ItemControllerTest {
 
     @Test
     void searchItems_FailedWhenTextEmpty() throws Exception {
-        List<Item> items = Collections.singletonList(new Item());
+        List<ItemDto> items = Collections.singletonList(ItemDto.builder().build());
         when(itemService.findItems(anyString(), anyInt(), anyInt())).thenReturn(items);
 
         mockMvc.perform(get("/items/search")
@@ -168,7 +168,7 @@ public class ItemControllerTest {
 
     @Test
     void searchItems_FailedWhenParamIsNegative() throws Exception {
-        List<Item> items = Collections.singletonList(new Item());
+        List<ItemDto> items = Collections.singletonList(ItemDto.builder().build());
         when(itemService.findItems(anyString(), anyInt(), anyInt())).thenReturn(items);
 
         mockMvc.perform(get("/items/search")
@@ -180,7 +180,7 @@ public class ItemControllerTest {
 
     @Test
     void searchItems_FailedWhenTextMissing() throws Exception {
-        List<Item> items = Collections.singletonList(new Item());
+        List<ItemDto> items = Collections.singletonList(ItemDto.builder().build());
         when(itemService.findItems(anyString(), anyInt(), anyInt())).thenReturn(items);
 
         mockMvc.perform(get("/items/search")

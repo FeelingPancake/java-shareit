@@ -37,7 +37,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<Item> find(@RequestParam(value = "text", required = true) String text,
+    public List<ItemDto> find(@RequestParam(value = "text", required = true) String text,
                            @RequestParam(value = "from", defaultValue = "0", required = false) @Min(value = 0) int from,
                            @RequestParam(value = "size", defaultValue = "10", required = false) @Min(value = 0) int size) {
         if (text.isBlank()) {

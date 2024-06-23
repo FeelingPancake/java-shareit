@@ -83,15 +83,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> findItems(String text, int from, int size) {
+    public List<ItemDto> findItems(String text, int from, int size) {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
-
-        List<Item> items = itemStorage.findAll(pageable).stream()
+        List<ItemDto> items = itemStorage.findAll(pageable).stream()
                 .filter(item ->
                         (item.getName().toLowerCase().contains(text.toLowerCase())
                                 || item.getDescription().toLowerCase().contains(text.toLowerCase()))
                                 && item.getAvailable())
+                .map(item -> {
+                    Hibernate.initialize(item.getOwner());
+                    return DtoMapper.toItemDto(item, item.getOwner(), null);
+                })
                 .collect(Collectors.toList());
 
         return items;

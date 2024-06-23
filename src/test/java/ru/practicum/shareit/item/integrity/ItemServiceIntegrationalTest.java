@@ -103,7 +103,7 @@ public class ItemServiceIntegrationalTest {
 
     @Test
     void findItems() {
-        List<Item> foundItems = itemService.findItems("tes", 0, 10);
+        List<ItemDto> foundItems = itemService.findItems("tes", 0, 10);
         assertNotNull(foundItems);
         assertEquals(foundItems.get(0).getId(), item.getId());
     }

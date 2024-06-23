@@ -14,7 +14,7 @@ public interface ItemService {
 
     List<ItemDtoOwner> getItems(Long ownerId, int from, int size);
 
-    List<Item> findItems(String text, int from, int size);
+    List<ItemDto> findItems(String text, int from, int size);
 
     ItemDto createItem(ItemDtoRequest itemDtoRequest, Long ownerId);
 
