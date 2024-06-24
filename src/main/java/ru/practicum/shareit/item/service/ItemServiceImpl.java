@@ -1,10 +1,10 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.storage.BookingJpaRepository;
 import ru.practicum.shareit.error.ElementAccessException;
 import ru.practicum.shareit.error.EntityNotExistsExeption;
@@ -25,7 +25,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserJpaRepository;
 import ru.practicum.shareit.utils.DtoMapper;
 
-import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItemServiceImpl implements ItemService {
     private final ItemJpaRepository itemStorage;
     private final UserJpaRepository userStorage;
@@ -42,6 +41,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRequestJpaRepository itemRequestStorage;
     private final ReplyJpaRepository replyStorage;
 
+    @Transactional(readOnly = true)
     @Override
     public ItemDtoOwner getItem(Long userId, Long itemId) {
         userStorage.findById(userId).orElseThrow(() -> new EntityNotExistsExeption(userId.toString()));
@@ -63,6 +63,7 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemDtoOwner> getItems(Long ownerId, int from, int size) {
         userStorage.findById(ownerId).orElseThrow(() -> new EntityNotExistsExeption(ownerId.toString()));
@@ -82,6 +83,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDtoOwners;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> findItems(String text, int from, int size) {
         int page = from / size;
@@ -92,41 +94,50 @@ public class ItemServiceImpl implements ItemService {
                                 || item.getDescription().toLowerCase().contains(text.toLowerCase()))
                                 && item.getAvailable())
                 .map(item -> {
-                    Hibernate.initialize(item.getOwner());
-                    return DtoMapper.toItemDto(item, item.getOwner(), null);
+                    List<Comment> comments = commentStorage.findByItemId(item.getId());
+                    return DtoMapper.toItemDto(item, item.getOwner(), null, comments);
                 })
                 .collect(Collectors.toList());
 
         return items;
     }
 
+    @Transactional
     @Override
     public ItemDto createItem(ItemDtoRequest itemDtoRequest, Long ownerId) {
         User user = userStorage.findById(ownerId).orElseThrow(() -> new EntityNotExistsExeption(ownerId.toString()));
-        ItemRequest itemRequest;
-
-        Item item = Item.builder()
-                .name(itemDtoRequest.getName())
-                .description(itemDtoRequest.getDescription())
-                .available(true)
-                .owner(user)
-                .build();
-
-
-        Item savedItem = itemStorage.save(item);
         Long requestId = itemDtoRequest.getRequestId();
+        Item savedItem;
 
         if (requestId != null) {
-            itemRequest = itemRequestStorage.findById(requestId).orElseThrow(
+            ItemRequest itemRequest = itemRequestStorage.findById(requestId).orElseThrow(
                     () -> new EntityNotExistsExeption("Запроса на вещь " + requestId + " не существует")
             );
+            Item item = Item.builder()
+                    .name(itemDtoRequest.getName())
+                    .description(itemDtoRequest.getDescription())
+                    .available(true)
+                    .owner(user)
+                    .request(itemRequest)
+                    .build();
 
+            savedItem = itemStorage.save(item);
             replyStorage.save(Reply.builder().user(user).itemRequest(itemRequest).item(savedItem).build());
+        } else {
+            Item item = Item.builder()
+                    .name(itemDtoRequest.getName())
+                    .description(itemDtoRequest.getDescription())
+                    .available(true)
+                    .owner(user)
+                    .build();
+
+            savedItem = itemStorage.save(item);
         }
 
-        return DtoMapper.toItemDto(savedItem, user, requestId);
+        return DtoMapper.toItemDto(savedItem, user, requestId, Collections.emptyList());
     }
 
+    @Transactional
     @Override
     public Comment createComment(Long userId,
                                  CommentDtoRequest commentDtoRequest,
@@ -149,9 +160,10 @@ public class ItemServiceImpl implements ItemService {
         return commentStorage.save(comment);
     }
 
+    @Transactional
     @Override
-    public Item updateItem(ItemDtoRequest itemDtoRequest, Long itemId, Long ownerId) {
-        userStorage.findById(ownerId).orElseThrow(() -> new EntityNotExistsExeption(ownerId.toString()));
+    public ItemDto updateItem(ItemDtoRequest itemDtoRequest, Long itemId, Long ownerId) {
+        User user = userStorage.findById(ownerId).orElseThrow(() -> new EntityNotExistsExeption(ownerId.toString()));
 
         Item item = itemStorage.findById(itemId).orElseThrow(
                 () -> new EntityNotExistsExeption(itemId.toString()));
@@ -160,16 +172,19 @@ public class ItemServiceImpl implements ItemService {
             throw new PermissionException(ownerId.toString());
         }
 
-        Hibernate.initialize(item.getComments());
-
         Item updateItem = item.toBuilder()
                 .name(itemDtoRequest.getName() == null ? item.getName() : itemDtoRequest.getName())
                 .description(itemDtoRequest.getDescription() == null ? item.getDescription() : itemDtoRequest.getDescription())
                 .available(itemDtoRequest.getAvailable() == null ? item.getAvailable() : itemDtoRequest.getAvailable())
                 .build();
-        return itemStorage.save(updateItem);
+        Item savedItem = itemStorage.save(updateItem);
+        List<Comment> comments = commentStorage.findByItemId(savedItem.getId());
+        Long requestId = savedItem.getRequest() != null ? savedItem.getId() : null;
+
+        return DtoMapper.toItemDto(savedItem, user, requestId, comments);
     }
 
+    @Transactional
     @Override
     public void deleteItem(Long id, Long ownerId) {
         Item item = itemStorage.findById(id).orElseThrow(() -> new EntityNotExistsExeption(id.toString()));

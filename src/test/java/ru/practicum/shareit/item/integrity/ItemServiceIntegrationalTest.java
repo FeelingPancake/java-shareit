@@ -172,7 +172,7 @@ public class ItemServiceIntegrationalTest {
                 .available(false)
                 .build();
 
-        Item updatedtItem = itemService.updateItem(itemDtoRequest, item.getId(), itemOwner.getId());
+        ItemDto updatedtItem = itemService.updateItem(itemDtoRequest, item.getId(), itemOwner.getId());
 
         assertNotNull(updatedtItem);
         assertEquals(item.getId(), updatedtItem.getId());

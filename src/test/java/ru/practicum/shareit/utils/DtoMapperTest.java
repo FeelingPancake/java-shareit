@@ -83,8 +83,8 @@ public class DtoMapperTest {
         Item item = Item.builder().id(1L).name("Item").description("Description").available(true).build();
 
         Long requestId = 1L;
-
-        ItemDto itemDto = DtoMapper.toItemDto(item, user, requestId);
+        List<Comment> comments = Collections.singletonList(Comment.builder().id(1L).user(user).item(item).text("Normal").build());
+        ItemDto itemDto = DtoMapper.toItemDto(item, user, requestId, comments);
 
         assertThat(itemDto).isNotNull();
         assertThat(itemDto.getId()).isEqualTo(item.getId());
@@ -93,6 +93,7 @@ public class DtoMapperTest {
         assertThat(itemDto.getAvailable()).isEqualTo(item.getAvailable());
         assertThat(itemDto.getRequestId()).isEqualTo(requestId);
         assertThat(itemDto.getOwner().getId()).isEqualTo(user.getId());
+        assertThat(itemDto.getComments().get(0).getAuthorName()).isEqualTo(user.getName());
     }
 
     @Test

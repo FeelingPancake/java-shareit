@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingRequest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.storage.BookingJpaRepository;
@@ -18,11 +19,9 @@ import ru.practicum.shareit.user.storage.UserJpaRepository;
 import ru.practicum.shareit.utils.enums.BookingStatus;
 import ru.practicum.shareit.utils.enums.State;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Transactional
 @Service
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
@@ -30,6 +29,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserJpaRepository userRepository;
     private final ItemJpaRepository itemRepository;
 
+    @Transactional(readOnly = true)
     @Override
     public Booking getBooking(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotExistsExeption(bookingId.toString()));
@@ -41,6 +41,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Booking> getBookingsForBooker(Long userId, State state, int from, int size) {
         if (!userRepository.existsById(userId)) {
@@ -73,6 +74,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Booking> getBookingsForOwner(Long userId, State state, int from, int size) {
         if (!userRepository.existsById(userId)) {
@@ -106,6 +108,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional
     @Override
     public Booking create(Long userId, BookingRequest bookingRequest) {
         Long itemId = bookingRequest.getItemId();
@@ -146,6 +149,7 @@ public class BookingServiceImpl implements BookingService {
         return savedBooking;
     }
 
+    @Transactional
     @Override
     public Booking setApprove(Long ownerId, Long bookingId, Boolean approved) {
         User user = userRepository.findById(ownerId).orElseThrow(() ->

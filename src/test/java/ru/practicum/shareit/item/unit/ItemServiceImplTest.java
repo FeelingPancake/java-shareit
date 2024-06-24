@@ -313,7 +313,7 @@ class ItemServiceImplTest {
 
         verify(userStorage, times(1)).findById(itemOwner.getId());
         verify(replyStorage, times(0)).save(any(Reply.class));
-        verify(itemStorage, times(1)).save(any(Item.class));
+        verify(itemStorage, times(0)).save(any(Item.class));
 
         long countAfter = itemStorage.count();
         assertEquals(0, countAfter);
@@ -406,7 +406,7 @@ class ItemServiceImplTest {
         when(itemStorage.findById(item.getId())).thenReturn(Optional.of(item));
         when(itemStorage.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Item result = itemService.updateItem(itemDtoRequest, item.getId(), itemOwner.getId());
+        ItemDto result = itemService.updateItem(itemDtoRequest, item.getId(), itemOwner.getId());
 
         assertNotNull(result);
         assertEquals(itemDtoRequest.getName(), result.getName());

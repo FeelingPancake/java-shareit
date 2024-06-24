@@ -18,7 +18,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoOwner;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
 
@@ -302,7 +301,7 @@ public class ItemControllerTest {
 
     @Test
     void updateItem_success() throws Exception {
-        Item updatedItem = Item.builder().id(1L).name("Updated Item").description("Updated Description").available(true).build();
+        ItemDto updatedItem = ItemDto.builder().id(1L).name("Updated Item").description("Updated Description").available(true).build();
 
         when(itemService.updateItem(any(ItemDtoRequest.class), anyLong(), anyLong())).thenReturn(updatedItem);
 
@@ -315,7 +314,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value("Updated Item"))
                 .andExpect(jsonPath("$.description").value("Updated Description"));
 
-        Item updatedItemWithOutDescription = Item.builder().id(1L).name("Updated Item").available(true).build();
+        ItemDto updatedItemWithOutDescription = ItemDto.builder().id(1L).name("Updated Item").available(true).build();
 
         when(itemService.updateItem(any(ItemDtoRequest.class), anyLong(), anyLong())).thenReturn(updatedItemWithOutDescription);
 

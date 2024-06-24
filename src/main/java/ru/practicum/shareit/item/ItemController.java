@@ -5,7 +5,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.utils.DtoMapper;
 import ru.practicum.shareit.utils.annotations.Marker;
@@ -38,8 +37,8 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> find(@RequestParam(value = "text", required = true) String text,
-                           @RequestParam(value = "from", defaultValue = "0", required = false) @Min(value = 0) int from,
-                           @RequestParam(value = "size", defaultValue = "10", required = false) @Min(value = 0) int size) {
+                              @RequestParam(value = "from", defaultValue = "0", required = false) @Min(value = 0) int from,
+                              @RequestParam(value = "size", defaultValue = "10", required = false) @Min(value = 0) int size) {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
@@ -65,9 +64,9 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     @Validated({Marker.OnUpdate.class})
-    public Item update(@Valid @RequestBody ItemDtoRequest itemDtoRequest,
-                       @PathVariable Long id,
-                       @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public ItemDto update(@Valid @RequestBody ItemDtoRequest itemDtoRequest,
+                          @PathVariable Long id,
+                          @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.updateItem(itemDtoRequest, id, ownerId);
     }
 

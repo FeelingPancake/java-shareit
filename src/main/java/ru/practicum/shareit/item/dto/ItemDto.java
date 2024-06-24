@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
+
 @Data
 @Builder(toBuilder = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -15,5 +17,6 @@ public class ItemDto {
     String name;
     String description;
     Boolean available;
+    List<CommentDto> comments;
     Long requestId;
 }

@@ -17,6 +17,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class DtoMapper {
     public static BookingDto toBookingDto(Booking booking) {
@@ -39,7 +40,7 @@ public abstract class DtoMapper {
                 .build();
     }
 
-    public static ItemDto toItemDto(Item item, User user, Long requestId) {
+    public static ItemDto toItemDto(Item item, User user, Long requestId, List<Comment> comments) {
         return ItemDto.builder()
                 .id(item.getId())
                 .owner(user)
@@ -47,6 +48,7 @@ public abstract class DtoMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .requestId(requestId)
+                .comments(comments.stream().map(DtoMapper::toCommentDto).collect(Collectors.toList()))
                 .build();
     }
 

@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.error.EntityNotExistsExeption;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
@@ -15,18 +16,17 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserJpaRepository;
 import ru.practicum.shareit.utils.DtoMapper;
 
-import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestJpaRepository itemRequestStorage;
     private final UserJpaRepository userJpaRepository;
 
+    @Transactional
     @Override
     public ItemRequestResponseDto createItemRequest(Long userId, ItemRequestCreateDto itemRequestCreateDto) {
         User user = userJpaRepository.findById(userId).orElseThrow(
@@ -36,6 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return DtoMapper.toItemRequestResponseDto(itemRequestStorage.save(itemRequest), Collections.emptyList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemRequestResponseDto> getAllRequestsForUser(Long userId) {
         User user = userJpaRepository.findById(userId).orElseThrow(
@@ -54,6 +55,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemRequestResponseDto> getAllRequests(Long userId, int from, int size) {
         int page = from / size;
@@ -70,6 +72,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ItemRequestResponseDto getItemRequest(Long userId, Long requestId) {
         userJpaRepository.findById(userId).orElseThrow(
