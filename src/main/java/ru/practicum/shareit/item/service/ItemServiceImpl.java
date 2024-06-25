@@ -25,10 +25,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserJpaRepository;
 import ru.practicum.shareit.utils.DtoMapper;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,18 +85,23 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> findItems(String text, int from, int size) {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
-        List<ItemDto> items = itemStorage.findAll(pageable).stream()
+        List<Item> items = itemStorage.findAll(pageable).stream()
                 .filter(item ->
                         (item.getName().toLowerCase().contains(text.toLowerCase())
                                 || item.getDescription().toLowerCase().contains(text.toLowerCase()))
                                 && item.getAvailable())
-                .map(item -> {
-                    List<Comment> comments = commentStorage.findByItemId(item.getId());
-                    return DtoMapper.toItemDto(item, item.getOwner(), null, comments);
-                })
                 .collect(Collectors.toList());
 
-        return items;
+        List<Long> itemIds = items.stream().map(Item::getId).collect(Collectors.toList());
+        List<Comment> comments = commentStorage.findByItemIdIn(itemIds);
+        Map<Item, List<Comment>> commentsByItemId = comments.stream().collect(Collectors.groupingBy(Comment::getItem));
+        List<ItemDto> itemDtos = items.stream()
+                .map(item -> {
+                    List<Comment> itemComments = commentsByItemId.getOrDefault(item, Collections.emptyList());
+                    return DtoMapper.toItemDto(item, item.getOwner(), null, itemComments);
+                }).collect(Collectors.toList());
+
+        return itemDtos;
     }
 
     @Transactional
@@ -179,7 +181,7 @@ public class ItemServiceImpl implements ItemService {
                 .build();
         Item savedItem = itemStorage.save(updateItem);
         List<Comment> comments = commentStorage.findByItemId(savedItem.getId());
-        Long requestId = savedItem.getRequest() != null ? savedItem.getId() : null;
+        Long requestId = savedItem.getRequest() != null ? savedItem.getRequest().getId() : null;
 
         return DtoMapper.toItemDto(savedItem, user, requestId, comments);
     }

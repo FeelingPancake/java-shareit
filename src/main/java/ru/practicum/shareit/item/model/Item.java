@@ -25,6 +25,7 @@ public class Item {
     String description;
     @Column(name = "is_available", nullable = false)
     Boolean available;
-    @OneToOne()
+    @ManyToOne
+    @JoinColumn(name = "request_id")
     ItemRequest request;
 }
