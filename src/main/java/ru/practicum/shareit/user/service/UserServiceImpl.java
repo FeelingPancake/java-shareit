@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.error.EntityNotExistsExeption;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -14,17 +15,20 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserJpaRepository userStorage;
 
+    @Transactional(readOnly = true)
     @Override
     public User getUser(Long id) {
         return userStorage.findById(id).orElseThrow(() -> new EntityNotExistsExeption(id.toString()));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<User> getUsers() {
 
         return userStorage.findAll();
     }
 
+    @Transactional
     @Override
     public User createUser(UserDto userDto) {
         User user = User.builder()
@@ -35,6 +39,7 @@ public class UserServiceImpl implements UserService {
         return userStorage.save(user);
     }
 
+    @Transactional
     @Override
     public User updateUser(UserDto userDto, Long id) {
         User user = userStorage.findById(id).orElseThrow(()
@@ -48,8 +53,9 @@ public class UserServiceImpl implements UserService {
         return userStorage.save(userToUpdate);
     }
 
+    @Transactional
     @Override
     public void deleteUser(Long id) {
-        userStorage.delete(userStorage.getById(id));
+        userStorage.delete(userStorage.findById(id).orElseThrow(() -> new EntityNotExistsExeption(id.toString())));
     }
 }

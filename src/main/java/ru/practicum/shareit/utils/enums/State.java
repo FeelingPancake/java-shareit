@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.controller;
+package ru.practicum.shareit.utils.enums;
 
 
 public enum State {

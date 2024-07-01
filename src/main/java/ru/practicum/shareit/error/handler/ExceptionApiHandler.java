@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.shareit.error.AlreadyExistsException;
 import ru.practicum.shareit.error.ElementAccessException;
 import ru.practicum.shareit.error.EntityNotExistsExeption;
 import ru.practicum.shareit.error.PermissionException;
@@ -19,7 +18,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class ExceptionApiHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class, UnsupportedOperationException.class})
     public ErrorResponse handleValidationExceptions(Throwable ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.toString());
         errorResponse.log();
@@ -37,14 +36,6 @@ public class ExceptionApiHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({EntityNotExistsExeption.class, PermissionException.class})
     public ErrorResponse handleNotFoundExceptions(RuntimeException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.toString());
-        errorResponse.log();
-        return errorResponse;
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler({AlreadyExistsException.class})
-    public ErrorResponse handleConflictExceptions(RuntimeException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.toString());
         errorResponse.log();
         return errorResponse;

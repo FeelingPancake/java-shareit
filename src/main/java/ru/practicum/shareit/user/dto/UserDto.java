@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.annotations.Marker;
+import ru.practicum.shareit.utils.annotations.Marker;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
