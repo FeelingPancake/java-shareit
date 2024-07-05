@@ -1,0 +1,70 @@
+package ru.practicum.shareit.item;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.utils.DtoMapper;
+
+import java.util.Collections;
+import java.util.List;
+
+@RestController
+@RequestMapping("/items")
+@RequiredArgsConstructor
+@Transactional
+public class ItemController {
+    private final ItemService itemService;
+
+    @GetMapping("/{itemId}")
+    public ItemDtoOwner get(@RequestHeader("X-Sharer-User-id") Long userId, @PathVariable Long itemId) {
+        return itemService.getItem(userId, itemId);
+    }
+
+    @GetMapping
+    public List<ItemDtoOwner> getAll(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+                                     @RequestParam(value = "from", defaultValue = "0", required = false) int from,
+                                     @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
+        return itemService.getItems(ownerId, from, size);
+    }
+
+    @GetMapping("/search")
+    public List<ItemDto> find(@RequestParam(value = "text", required = true) String text,
+                              @RequestParam(value = "from", defaultValue = "0", required = false) int from,
+                              @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
+        if (text.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return itemService.findItems(text, from, size);
+    }
+
+    @PostMapping
+    public ItemDto create(@RequestBody ItemDtoRequest itemDtoRequest, @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+        return itemService.createItem(itemDtoRequest, ownerId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                    @RequestBody CommentDtoRequest commentDtoRequest,
+                                    @PathVariable Long itemId) {
+
+        Comment comment = itemService.createComment(userId, commentDtoRequest, itemId);
+
+        return DtoMapper.toCommentDto(comment);
+    }
+
+    @PatchMapping("/{id}")
+    public ItemDto update(@RequestBody ItemDtoRequest itemDtoRequest,
+                          @PathVariable Long id,
+                          @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+        return itemService.updateItem(itemDtoRequest, id, ownerId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id, @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+        itemService.deleteItem(id, ownerId);
+    }
+}
