@@ -1,4 +1,5 @@
 # java-shareit
 Training project for yandex. 
-Key features: 
--
+
+Сервис для аренды вещей
+
