@@ -4,7 +4,6 @@ package ru.practicum.shareit.item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import java.util.Map;
 
 @Service
-@PropertySource("classpath:application.properties")
 public class ItemClient extends BaseClient {
     private static final String API_PREFIX = "/items";
 
